@@ -84,7 +84,7 @@ class Search extends React.Component {
 
 
     handleOnKeyPress = (event)=>{
-        
+        // console.log(this.state.cursor)
         if (event.keyCode === 38 && this.state.cursor > 0) {
             // down up
             console.log('up key')
@@ -94,7 +94,8 @@ class Search extends React.Component {
             this.setState( prevState => ({
                 cursor: prevState.cursor - 1
               }))
-              console.log(this.state.cursor)
+            //   console.log(this.state.cursor)
+              
             
         }
         else if (event.keyCode === 40 && this.state.cursor < this.state.items.length - 1) {
@@ -106,8 +107,8 @@ class Search extends React.Component {
             this.setState( prevState => ({
                 cursor: prevState.cursor + 1
               }))
+              
 
-            console.log(this.state.cursor)
             
         }
         else if (event.keyCode === 37) {
@@ -121,11 +122,13 @@ class Search extends React.Component {
     componentDidMount() {
 		
 		document.addEventListener("keydown", this.handleOnKeyPress, false); // 38 40
+        document.addEventListener("keydown", this.handleOnKeyUp, false); // 38 40
 	}
 
 	componentWillUnmount() {
 		
 		document.removeEventListener("keydown", this.handleOnKeyPress, false); // 38 40
+        document.removeEventListener("keydown", this.handleOnKeyUp, false); // 38 40
 	}
 
     handleOnCLickCity = (itemchoose)=>{
@@ -140,13 +143,31 @@ class Search extends React.Component {
         this.setState({
             isShow: !this.state.isShow
         })
-        
+        // console.log(this)
     }
+
+    handleOnKeyUp = (event) => {
+
+        if (event.keyCode === 13 && this.state.cursor > 0) {
+            console.log(this.state.cursor)
+            let i = this.state.cursor + 1;
+            let search = this.state.items.filter((item,index)=>{
+                
+                return (item.id == i)
+            })
+            console.log(search[0].city)
+            this.setState({
+                search: search
+            })
+            this.handleOnCLickCity(search[0])
+        }
+    }
+    
 
 
     render() {
         const {items,item, isShow,userInput,search} = this.state;
-
+        // console.log(this)
         return (
             <div className="table">
                 <table style={{width:"100%"}}>
@@ -185,7 +206,7 @@ class Search extends React.Component {
                         items.map((item,index)=>{
                             return (
                                 <tr key={item.id}>
-                                    <td><span id={item.id} className={this.state.cursor === index ? 'activea' : null} onClick={()=>this.handleOnCLickCity(item)}>{item.city}</span></td>
+                                    <td><span id={item.id} className={this.state.cursor === index ? 'activea' : null} onClick={()=>this.handleOnCLickCity(item)} onKeyDown={()=>this.handleOnKeyUp(item)}>{item.city}</span></td>
                                     <td><span id={item.id} className={this.state.cursor === index ? 'activea' : null} onClick={()=>this.handleOnCLickCity(item)}>{item.province}</span></td>
                                 </tr>
                             )
