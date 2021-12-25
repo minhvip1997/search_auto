@@ -19,28 +19,120 @@ class Search extends React.Component {
         },
         isShow: true,
         search: [],
-        userInput: ''
+        userInput: '',
+        cursor: 0,
     }
 
     handleOnChangeInputSearch = (event)=>{
+
+        let input = event.target.value
         this.setState({
-            userInput: event.target.value
+            userInput: input,
+            isShow: false
         })
-        console.log(this.state.userInput)
+        // console.log(this.state.userInput)
         let  a = this.state.items.filter((item,index)=>{
-            return (item.city.toLowerCase().includes(this.state.userInput.toLowerCase()))
+            console.log(item)
+            return (item.city.toLowerCase().includes(input.toLowerCase()))
         })
-        console.log(a)
+        // console.log(a)
         this.setState({
             search: a
         })
         
     }
 
-    handleOnCLickCity = (itemchoose)=>{
-        // console.log(itemchoose)
+    handleOnChangeInputCity = (event) =>{
+        let input = event.target.value
         this.setState({
-            item: itemchoose
+            item: {
+                ...this.state.city,
+                city: input
+          },
+            isShow: false
+        })
+        // console.log(this.state.userInput)
+        let  a = this.state.items.filter((item,index)=>{
+            console.log(item)
+            return (item.city.toLowerCase().includes(input.toLowerCase()))
+        })
+        // console.log(a)
+        this.setState({
+            search: a
+        })
+    }
+
+    handleOnChangeInputProvince = (event) =>{
+        let input = event.target.value
+        this.setState({
+            item: {
+                ...this.state.province,
+                province: input
+          },
+            isShow: false
+        })
+        // console.log(this.state.userInput)
+        let  a = this.state.items.filter((item,index)=>{
+            console.log(item)
+            return (item.province.toLowerCase().includes(input.toLowerCase()))
+        })
+        // console.log(a)
+        this.setState({
+            search: a
+        })
+    }
+
+
+    handleOnKeyPress = (event)=>{
+        
+        if (event.keyCode === 38 && this.state.cursor > 0) {
+            // down up
+            console.log('up key')
+            this.setState({
+                isShow:false
+            })
+            this.setState( prevState => ({
+                cursor: prevState.cursor - 1
+              }))
+              console.log(this.state.cursor)
+            
+        }
+        else if (event.keyCode === 40 && this.state.cursor < this.state.items.length - 1) {
+            // down arrow
+            console.log('up down')
+            this.setState({
+                isShow:false
+            })
+            this.setState( prevState => ({
+                cursor: prevState.cursor + 1
+              }))
+
+            console.log(this.state.cursor)
+            
+        }
+        else if (event.keyCode === 37) {
+           // left arrow
+        }
+        else if (event.keyCode === 39) {
+           // right arrow
+        }
+    }
+
+    componentDidMount() {
+		
+		document.addEventListener("keydown", this.handleOnKeyPress, false); // 38 40
+	}
+
+	componentWillUnmount() {
+		
+		document.removeEventListener("keydown", this.handleOnKeyPress, false); // 38 40
+	}
+
+    handleOnCLickCity = (itemchoose)=>{
+        this.setState({
+            item: itemchoose,
+            userInput: itemchoose.city,
+            isShow: true
         });
     }
 
@@ -50,6 +142,7 @@ class Search extends React.Component {
         })
         
     }
+
 
     render() {
         const {items,item, isShow,userInput,search} = this.state;
@@ -65,12 +158,9 @@ class Search extends React.Component {
                         <button onClick={()=>this.handleOnClickShow()}>Show</button> :
                         <button onClick={()=>this.handleOnClickShow()}>Hide</button>
                         }
-                        
                         </th>
                     </tr>
-                    
-                    
-                    
+                     
                 </thead>
                 {isShow === false ? 
                 <tbody>
@@ -83,28 +173,24 @@ class Search extends React.Component {
                         <th>City</th>
                         <th>Province</th>
                     </tr>
-                    {search.length >0 ? search.map((item,index)=>{
-                    return (
-                        
-                        <tr key={item.id}>
-                            <td><span onClick={()=>this.handleOnCLickCity(item)}>{item.city}</span></td>
-                            <td><span onClick={()=>this.handleOnCLickCity(item)}>{item.province}</span></td>
-                        </tr>
-                        
-                    )
-                    })
-                    :
-                    items.map((item,index)=>{
+                        {search.length >0 ? search.map((item,index)=>{
                         return (
-                            
                             <tr key={item.id}>
-                                <td><span onClick={()=>this.handleOnCLickCity(item)}>{item.city}</span></td>
-                                <td><span onClick={()=>this.handleOnCLickCity(item)}>{item.province}</span></td>
+                                <td><span id={item.id} className={this.state.cursor === index ? 'activea' : null} onClick={()=>this.handleOnCLickCity(item)}>{item.city}</span></td>
+                                <td><span id={item.id} className={this.state.cursor === index ? 'activea' : null} onClick={()=>this.handleOnCLickCity(item)}>{item.province}</span></td>
                             </tr>
-                            
                         )
-                    }) 
-                    }
+                        })
+                        :
+                        items.map((item,index)=>{
+                            return (
+                                <tr key={item.id}>
+                                    <td><span id={item.id} className={this.state.cursor === index ? 'activea' : null} onClick={()=>this.handleOnCLickCity(item)}>{item.city}</span></td>
+                                    <td><span id={item.id} className={this.state.cursor === index ? 'activea' : null} onClick={()=>this.handleOnCLickCity(item)}>{item.province}</span></td>
+                                </tr>
+                            )
+                        }) 
+                        }
                     </tbody>
                     :
                     <tbody></tbody>
